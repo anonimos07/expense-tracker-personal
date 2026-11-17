@@ -18,8 +18,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-        // to be created, schema not yet final
-        // DefaultDataService::createFor($user);
+        
+        DefaultDataService::createFor($user);
 
         return response()->json([
             'user' => $user,

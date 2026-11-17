@@ -14,12 +14,27 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
     public function run(): void
-    {
-        // User::factory(10)->create();
+{
+    $user = User::factory()->create([
+        'name' => 'Test User',
+        'email' => 'test@example.com',
+        'password' => bcrypt('password'),
+    ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+    DefaultDataService::createFor($user);
+
+    $wallet = $user->wallets()->first();
+    $categories = $user->categories()->where('type', 'expense')->get();
+
+    for ($i = 0; $i < 60; $i++) {
+        $user->transactions()->create([
+            'wallet_id'   => $wallet->id,
+            'category_id' => $categories->random()->id,
+            'type'        => 'expense',
+            'amount'      => fake()->randomFloat(2, 20, 2500),
+            'description' => fake()->sentence(3),
+            'date'        => fake()->dateTimeBetween('-3 months', 'now'),
         ]);
     }
+}
 }
