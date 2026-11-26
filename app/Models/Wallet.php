@@ -22,6 +22,23 @@ class Wallet extends Model
         return $this->hasMany(Transaction::class); 
         
     }
+
+    public function scopeWithBalance(Builder $query): Builder
+    {
+        return $query
+            ->withSum(['transactions as income_total' => fn ($q) => $q->where('type', 'income')], 'amount')
+            ->withSum(['transactions as expense_total' => fn ($q) => $q->where('type', 'expense')], 'amount');
+    }
+
+    public function getBalanceAttribute(): float
+    {
+        return round(
+            (float) $this->initial_balance
+            + (float) ($this->income_total ?? 0)
+            - (float) ($this->expense_total ?? 0),
+            2
+        );
+    }
     
     use HasFactory;
     
